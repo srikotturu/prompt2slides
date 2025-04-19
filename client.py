@@ -16,6 +16,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 
+from dotenv import load_dotenv 
+
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -49,14 +52,14 @@ class PowerPointAssistant:
         self.mcp_servers = {
             "powerpoint": {
                 "command": "python",
-                "args": [os.path.join(self.base_path, "prompt2slides", "mcp_server.py")],
+                "args": [os.path.join(self.base_path, "mcp_server.py")],
                 "transport": "stdio",
             }
         }
         
         # Initialize model
         self.model = ChatGoogleGenerativeAI(
-            model="gemini-pro",
+            model="gemini-2.0-flash-lite",
             temperature=0.7,
             google_api_key=self.api_key
         )
@@ -72,15 +75,15 @@ class PowerPointAssistant:
         current_date = datetime.now().strftime("%Y-%m-%d")
         return f"""You are a PowerPoint creation assistant. Today is {current_date}.
 
-You can help users:
-1. Create new presentations from scratch
-2. Add slides with text, bullet points, images, and charts
-3. Format and style slide content
-4. Save presentations to files
+        You can help users:
+        1. Create new presentations from scratch
+        2. Add slides with text, bullet points, images, and charts
+        3. Format and style slide content
+        4. Save presentations to files
 
-Always respond with clear, step-by-step explanations of what you're doing.
-When a presentation is created or modified, summarize the changes and current state.
-"""
+        Always respond with clear, step-by-step explanations of what you're doing.
+        When a presentation is created or modified, summarize the changes and current state.
+        """
 
     async def _create_agent(self, client):
         """Create the React agent with tools"""
