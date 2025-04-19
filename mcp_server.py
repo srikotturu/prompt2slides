@@ -1,5 +1,6 @@
+from typing import Any
 from fastmcp import FastMCP
-import pptx_services
+import apis
 
 # Initialize FastMCP server
 mcp = FastMCP("powerpoint")
@@ -18,7 +19,7 @@ async def create_presentation(
     Returns:
         str: Presentation ID for use in other operations.
     """
-    return await pptx_services.create_presentation(filename=filename)
+    return await apis.create_presentation(filename=filename)
 
 
 @mcp.tool()
@@ -26,7 +27,7 @@ async def add_slide(
     presentation_id: str,
     layout_index: int = 1,
     title: str | None = None,
-    background_color: tuple | None = None,
+    background_color: list[float] = [255.0, 255.0, 255.0],
 ) -> str:
     """
     Adds a new slide to the presentation.
@@ -45,12 +46,12 @@ async def add_slide(
             7 - Content with Caption
             8 - Picture with Caption
         title (str, optional): Slide title.
-        background_color (tuple, optional): RGB tuple for background color (e.g., (255, 255, 255)).
+        background_color (list[float], optional): RGB list for background color. Defaults to [255.0, 255.0, 255.0].
     
     Returns:
         str: Slide ID for use in other operations.
     """
-    return await pptx_services.add_slide(
+    return await apis.add_slide(
         presentation_id=presentation_id,
         layout_index=layout_index,
         title=title,
@@ -69,7 +70,7 @@ async def add_text(
     height: float = 1.0,
     font_size: int = 18,
     font_name: str = "Calibri",
-    color: tuple = (0, 0, 0),
+    color: list[float] = [0.0, 0.0, 0.0],
     bold: bool = False,
     italic: bool = False,
     underline: bool = False,
@@ -88,7 +89,7 @@ async def add_text(
         height (float, optional): Height of text box in inches. Defaults to 1.0.
         font_size (int, optional): Font size in points. Defaults to 18.
         font_name (str, optional): Font name. Defaults to "Calibri".
-        color (tuple, optional): RGB color tuple (e.g., (255, 0, 0) for red). Defaults to (0, 0, 0).
+        color (list[float], optional): RGB color list (e.g., [255, 0, 0] for red). Defaults to [0, 0, 0].
         bold (bool, optional): Whether text should be bold. Defaults to False.
         italic (bool, optional): Whether text should be italic. Defaults to False.
         underline (bool, optional): Whether text should be underlined. Defaults to False.
@@ -97,7 +98,7 @@ async def add_text(
     Returns:
         str: Text shape ID.
     """
-    return await pptx_services.add_text(
+    return await apis.add_text(
         presentation_id=presentation_id,
         slide_id=slide_id,
         text=text,
@@ -126,7 +127,7 @@ async def add_paragraph(
     height: float = 3.0,
     font_size: int = 16,
     font_name: str = "Calibri",
-    color: tuple = (0, 0, 0),
+    color: list[float] = [0.0, 0.0, 0.0],
     alignment: str = "LEFT",
     line_spacing: float = 1.0,
 ) -> str:
@@ -143,14 +144,14 @@ async def add_paragraph(
         height (float, optional): Height of text box in inches. Defaults to 3.0.
         font_size (int, optional): Font size in points. Defaults to 16.
         font_name (str, optional): Font name. Defaults to "Calibri".
-        color (tuple, optional): RGB color tuple. Defaults to (0, 0, 0).
+        color (list[float], optional): RGB color list. Defaults to [0.0, 0.0, 0.0].
         alignment (str, optional): Text alignment (LEFT, CENTER, RIGHT). Defaults to "LEFT".
         line_spacing (float, optional): Line spacing multiplier. Defaults to 1.0.
     
     Returns:
         str: Text box shape ID.
     """
-    return await pptx_services.add_paragraph(
+    return await apis.add_paragraph(
         presentation_id=presentation_id,
         slide_id=slide_id,
         text=text,
@@ -170,14 +171,14 @@ async def add_paragraph(
 async def add_bullet_list(
     presentation_id: str,
     slide_id: str,
-    items: list,
+    items: list[str],
     left: float = 1.0,
     top: float = 2.0,
     width: float = 8.0,
     height: float = 3.0,
     font_size: int = 16,
     font_name: str = "Calibri",
-    color: tuple = (0, 0, 0),
+    color: list[float] = [0.0, 0.0, 0.0],
     level: int = 0,
     bullet_character: str | None = None,
 ) -> str:
@@ -194,14 +195,14 @@ async def add_bullet_list(
         height (float, optional): Height of text box in inches. Defaults to 3.0.
         font_size (int, optional): Font size in points. Defaults to 16.
         font_name (str, optional): Font name. Defaults to "Calibri".
-        color (tuple, optional): RGB color tuple. Defaults to (0, 0, 0).
+        color (list[float], optional): RGB color list. Defaults to [0, 0, 0].
         level (int, optional): Indentation level (0 for top level). Defaults to 0.
         bullet_character (str, optional): Custom bullet character. Defaults to None.
     
     Returns:
         str: Text box shape ID.
     """
-    return await pptx_services.add_bullet_list(
+    return await apis.add_bullet_list(
         presentation_id=presentation_id,
         slide_id=slide_id,
         items=items,
@@ -242,7 +243,7 @@ async def add_image(
     Returns:
         str: Image shape ID.
     """
-    return await pptx_services.add_image(
+    return await apis.add_image(
         presentation_id=presentation_id,
         slide_id=slide_id,
         image_path=image_path,
@@ -258,8 +259,8 @@ async def add_chart(
     presentation_id: str,
     slide_id: str,
     chart_type: str,
-    categories: list,
-    data_series: list,
+    categories: list[str],
+    data_series: list[dict[str, list[float]]],
     left: float = 1.0,
     top: float = 2.0,
     width: float = 8.0,
@@ -275,7 +276,7 @@ async def add_chart(
         chart_type (str): Type of chart (BAR_CLUSTERED, BAR_STACKED, COLUMN_CLUSTERED, 
                           LINE, PIE, SCATTER, AREA, RADAR, etc.)
         categories (list): List of category labels.
-        data_series (list): List of tuples (series_name, values).
+        data_series (list[dict]): List of dictionaries with 'name' and 'values' keys.
         left (float, optional): Left position in inches. Defaults to 1.0.
         top (float, optional): Top position in inches. Defaults to 2.0.
         width (float, optional): Width of chart in inches. Defaults to 8.0.
@@ -285,7 +286,7 @@ async def add_chart(
     Returns:
         str: Chart shape ID.
     """
-    return await pptx_services.add_chart(
+    return await apis.add_chart(
         presentation_id=presentation_id,
         slide_id=slide_id,
         chart_type=chart_type,
@@ -303,12 +304,12 @@ async def add_chart(
 async def add_table(
     presentation_id: str,
     slide_id: str,
-    data: list,
+    data: list[dict[str, Any]],
     left: float = 1.0,
     top: float = 2.0,
     width: float | None = None,
     height: float | None = None,
-    column_widths: list | None = None,
+    column_widths: list[float] | None = None,
     first_row_is_header: bool = True,
 ) -> str:
     """
@@ -328,7 +329,7 @@ async def add_table(
     Returns:
         str: Table shape ID.
     """
-    return await pptx_services.add_table(
+    return await apis.add_table(
         presentation_id=presentation_id,
         slide_id=slide_id,
         data=data,
@@ -350,8 +351,8 @@ async def add_shape(
     top: float = 2.0,
     width: float = 2.0,
     height: float = 2.0,
-    fill_color: tuple | None = None,
-    line_color: tuple | None = None,
+    fill_color: list[float] = [200.0, 200.0, 200.0],
+    line_color: list[float] = [0.0, 0.0, 0.0],
     line_width: float = 1.0,
 ) -> str:
     """
@@ -365,14 +366,14 @@ async def add_shape(
         top (float, optional): Top position in inches. Defaults to 2.0.
         width (float, optional): Width of shape in inches. Defaults to 2.0.
         height (float, optional): Height of shape in inches. Defaults to 2.0.
-        fill_color (tuple, optional): RGB fill color. Defaults to None.
-        line_color (tuple, optional): RGB line color. Defaults to None.
+        fill_color (list[float], optional): RGB fill color. Defaults to None.
+        line_color (list[float], optional): RGB line color. Defaults to None.
         line_width (float, optional): Line width in points. Defaults to 1.0.
     
     Returns:
         str: Shape ID.
     """
-    return await pptx_services.add_shape(
+    return await apis.add_shape(
         presentation_id=presentation_id,
         slide_id=slide_id,
         shape_type=shape_type,
@@ -407,7 +408,7 @@ async def add_header_footer(
     Returns:
         str: Result of the operation.
     """
-    return await pptx_services.add_header_footer(
+    return await apis.add_header_footer(
         presentation_id=presentation_id,
         header_text=header_text,
         footer_text=footer_text,
@@ -431,7 +432,7 @@ async def save_presentation(
     Returns:
         str: Path to the saved file.
     """
-    return await pptx_services.save_presentation(
+    return await apis.save_presentation(
         presentation_id=presentation_id,
         filename=filename,
     )
@@ -440,19 +441,19 @@ async def save_presentation(
 @mcp.tool()
 async def create_complete_presentation(
     title: str,
-    slides_content: list,
+    slides_content: list[dict],
     subtitle: str | None = None,
     header: str | None = None,
     footer: str | None = None,
     filename: str | None = None,
-    title_slide_color: tuple | None = None,
+    title_slide_color: list[float] | None = None,
 ) -> str:
     """
     Creates a complete PowerPoint presentation with multiple slides.
     
     Args:
         title (str): Presentation title.
-        slides_content (list): List of slide content dictionaries.
+        slides_content (list[dict]): List of slide content dictionaries.
             Each dictionary may contain:
             - title (str): Slide title
             - text (str): Paragraph text
@@ -466,7 +467,7 @@ async def create_complete_presentation(
         header (str, optional): Header text for all slides. Defaults to None.
         footer (str, optional): Footer text for all slides. Defaults to None.
         filename (str, optional): Name of the file (without extension). Defaults to None.
-        title_slide_color (tuple, optional): RGB color for title slide. Defaults to None.
+        title_slide_color (list[float], optional): RGB color for title slide. Defaults to None.
     
     Returns:
         str: ID of the created presentation.
@@ -479,7 +480,7 @@ async def create_complete_presentation(
         "title_slide_color": title_slide_color,
     }
     
-    return await pptx_services.create_complete_presentation(
+    return await apis.create_complete_presentation(
         title=title,
         slides_content=slides_content,
         options=options,
