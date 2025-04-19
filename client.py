@@ -45,14 +45,14 @@ class PowerPointAssistant:
             
         self.verbose = verbose
         self.conversation_history = []
-        self.base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        # self.base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         self.session_started = datetime.now()
         
         # Configure MCP servers
         self.mcp_servers = {
             "powerpoint": {
                 "command": "python",
-                "args": [os.path.join(self.base_path, "mcp_server.py")],
+                "args": ["mcp_server.py"],
                 "transport": "stdio",
             }
         }
